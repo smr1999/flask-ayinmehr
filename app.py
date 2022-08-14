@@ -1,16 +1,10 @@
-from flask import Flask,render_template
-import random
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-@app.route('/result')
-def result():
-    # 1 for Heads
-    # 2 for Tails
-    heads_or_tails = random.randint(1,2)
-    
-    return render_template('result.html',heads_or_tails=heads_or_tails)
+    students = ['John', 'Sara', 'Mohammad']
+    numbers = list(range(1,21))
+    return render_template('index.html',students=students,numbers=numbers)
