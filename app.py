@@ -1,10 +1,16 @@
-from flask import Flask, render_template
+from flask import Flask,request
 
 app = Flask(__name__)
 
 
-@app.route('/')
+# @app.route('/',methods=["GET","POST"])
+# def index():
+#     result = f"Request Method : {request.method} \
+#     <br> Request Args : {request.args} \
+#     <br> Request Form : {request.form}"
+#     return result
+
+@app.route('/',methods=["GET","POST"])
 def index():
-    students = ['John', 'Sara', 'Mohammad']
-    numbers = list(range(1,21))
-    return render_template('index.html',students=students,numbers=numbers)
+    name = request.args.get('name') or request.form.get('name')
+    return f"Hello {name}"
