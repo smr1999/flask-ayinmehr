@@ -1,16 +1,24 @@
-from flask import Flask,request
+from flask import Flask,render_template,request
 
 app = Flask(__name__)
 
+auth = {"username":"ali",
+        "password":"123"}
 
-# @app.route('/',methods=["GET","POST"])
-# def index():
-#     result = f"Request Method : {request.method} \
-#     <br> Request Args : {request.args} \
-#     <br> Request Form : {request.form}"
-#     return result
 
 @app.route('/',methods=["GET","POST"])
 def index():
-    name = request.args.get('name') or request.form.get('name')
-    return f"Hello {name}"
+    print(request.form)
+    return render_template("index.html")
+
+@app.route('/login',methods=["POST"])
+def login():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    
+    if not username or not password:
+        return "Error"
+
+    if username.lower() == auth["username"] and password == auth["password"]:
+        return f"Welcome user {username}"
+    return "Invalid credential"
