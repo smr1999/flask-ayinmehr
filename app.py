@@ -1,24 +1,16 @@
 from flask import Flask,render_template
+import random
 
-# app = Flask(__name__)
-app = Flask(__name__,template_folder="templates")
-
-# @app.route('/')
-# def index():
-#     return """
-#     <!Doctype html>
-#     <html>
-#         <head>
-#             <title>
-#             My Flask App 
-#             </title>
-#         </head>
-#         <body>
-#             <h1>Hello World!</h1>
-#         </body>
-#     </html>
-#     """
+app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/result')
+def result():
+    # 1 for Heads
+    # 2 for Tails
+    heads_or_tails = random.randint(1,2)
+    
+    return render_template('result.html',heads_or_tails=heads_or_tails)
