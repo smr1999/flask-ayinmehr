@@ -25,4 +25,4 @@ def login():
         return "Login success"
     if session.get("email") is not None:
         return "You have already logged in"    
-    return render_template('login.html',form=login_form)
+    return render_template('admin/login.html',form=login_form,title="Admin Login")

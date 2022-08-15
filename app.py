@@ -5,7 +5,7 @@ from config import Development
 
 app = Flask(__name__)
 app.config.from_object(Development)
-
+app.jinja_options
 # initilize dependencies
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
