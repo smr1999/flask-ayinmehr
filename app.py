@@ -1,25 +1,21 @@
-from flask import Flask, g,request
-import sqlite3
+from flask import Flask,request
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flask:password@localhost:3306/flask_tut'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-def create_db():
-    return sqlite3.connect('./db.sqlite3')
-
-
-@app.before_request
-def before_request():
-    g.db = create_db()
-    g.cur = g.db.cursor()
-    print("before")
+db = SQLAlchemy(app)
 
 
-@app.after_request
-def after_request(response):
-    g.db.close()
-    print("after")
-    return response
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer(),primary_key=True)
+    username = db.Column(db.String(length=32),nullable=False,unique=True) # String can translate to char or varchar
+    password = db.Column(db.String(128),nullable=False)
+
 
 
 @app.route('/')
@@ -27,23 +23,21 @@ def index():
     action = request.args.get('action')
     username = request.args.get('username')
     password = request.args.get('password')
-    if action and username and password :
-        if action.lower() == 'register':
-            try:
-                g.cur.execute('INSERT INTO users(username,password) values (?,?)',(
-                username,password
-            )) # Do not use fstring because for example fstring can not convert None(python) to null(SQL)
-                g.db.commit()
-                return 'User added'
-            except sqlite3.IntegrityError:
-                g.db.rollback()
-                return 'username dupplicated'
-        elif action.lower() == 'login':
-            g.cur.execute('SELECT * FROM users WHERE username = ? AND password = ?',(username,password))
-            user = g.cur.fetchone()
-            if user:
-                return f'Welcome User {user[1]}'
-            else:
-                return 'User not found'      
-    print("index view")
+
+    if action and username and password:
+        if action.lower() == 'login':
+            user = User.query.filter(username==username and password==password).first()
+            if not user:
+                return 'User not found'
+            return f'Welcome user {user.username}'
+        elif action.lower() == 'register':
+            try :
+                user = User(username=username,password=password)
+                db.session.add(user)
+                db.session.commit()
+                return 'User created successfully'
+            except IntegrityError:
+                db.session.rollback()
+                return 'User duplicated'
+            
     return 'Hello world'
