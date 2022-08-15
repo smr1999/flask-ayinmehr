@@ -1,24 +1,19 @@
 from flask import Flask,render_template,request
+from forms import LoginForm
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret'
 
-auth = {"username":"ali",
-        "password":"123"}
-
-
-@app.route('/',methods=["GET","POST"])
+@app.route('/')
 def index():
-    print(request.form)
-    return render_template("index.html")
+    login_form = LoginForm()
+    return render_template('index.html',form=login_form)
 
-@app.route('/login',methods=["POST"])
+
+@app.route('/login',methods=['POST'])
 def login():
-    username = request.form.get("username")
-    password = request.form.get("password")
-    
-    if not username or not password:
+    login_form = LoginForm(request.form)
+    if not login_form.validate_on_submit():
+        print(login_form.errors)
         return "Error"
-
-    if username.lower() == auth["username"] and password == auth["password"]:
-        return f"Welcome user {username}"
-    return "Invalid credential"
+    return "OK"
