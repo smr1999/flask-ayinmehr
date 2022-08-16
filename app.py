@@ -17,5 +17,8 @@ app.register_blueprint(admin)
 from mod_user import user
 app.register_blueprint(user)
 
+from mod_blog import blog
+app.register_blueprint(blog)
+
 # Main app
 import views
