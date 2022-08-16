@@ -1,0 +1,9 @@
+{% macro register_errors(field) %}
+    {% with errors=field.errors %}
+        {% if errors %}
+            {% for error in errors %}
+                <div class="form-text text-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+{% endmacro %}

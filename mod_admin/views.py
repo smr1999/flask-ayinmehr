@@ -1,4 +1,4 @@
-from flask import get_flashed_messages,render_template, request, abort, session,flash,redirect,url_for
+from flask import render_template, request, abort, session,flash,redirect,url_for
 from http import HTTPStatus
 from . import admin
 from .utils import admin_view
