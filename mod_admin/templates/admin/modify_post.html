@@ -30,6 +30,11 @@
                         {{ form.slug(class="form-control") }}
                         {{ field_error(form.slug) }}
                     </div>
+                    <div class="mb-3">
+                        {{ form.categories_.label(class="form-label") }}
+                        {{ form.categories_(class="form-control",style="list-style-type: none;") }}
+                        {{ field_error(form.categories_) }}
+                    </div>
                     {{ form.submit(class="btn btn-warning") }}
                 </fieldset>
             </form>

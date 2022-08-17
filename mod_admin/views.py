@@ -77,9 +77,11 @@ def list_posts():
 def create_post():
     post = Post()
     create_post_form = CreatePostForm(obj=post)
+    create_post_form.categories_.choices = [(category.id,category.name) for category in Category.query.all()]
     if request.method == 'POST':
         if create_post_form.validate_on_submit():
             create_post_form.populate_obj(post)
+            post.categories = [Category.query.get(category_id) for category_id in create_post_form.categories_.data ]
             db.session.add(post)
             db.session.commit()
             flash("Post created successfully","success")
@@ -102,14 +104,17 @@ def modify_post(post_id):
     post = Post.query.get(post_id)
     modify_post_form = ModifyPostForm(obj=post)
     modify_post_form.set_post_id(post_id)
+    modify_post_form.categories_.choices = [(category.id,category.name) for category in Category.query.all()]
     if request.method == 'POST':
         if modify_post_form.validate_on_submit():
             modify_post_form.populate_obj(post)
+            post.categories = [Category.query.get(category_id) for category_id in modify_post_form.categories_.data ]
             db.session.add(post)
             db.session.commit()
             flash("Post modified successfully","success")
-            return redirect(url_for('admin.list_posts'))
+            return redirect(url_for('admin.modify_post',post_id=post_id))
         flash("Fix the errors and send form again","danger")
+    modify_post_form.categories_.data = [category.id for category in post.categories]
     return render_template('admin/modify_post.html',form=modify_post_form,title="Modify Post")
 
 @admin.route('/categories')
@@ -154,6 +159,6 @@ def modify_category(category_id):
             db.session.add(category)
             db.session.commit()
             flash("Category modified successfully","success")
-            return redirect(url_for('admin.list_categories'))
+            return redirect(url_for('admin.modify_category',category_id=category_id))
         flash("Fix the errors and send form again","danger")
     return render_template('admin/modify_category.html',form=modify_category_form,title="Modify Category")

@@ -4,13 +4,14 @@ from wtforms import StringField,TextAreaField,SubmitField
 from wtforms.validators import DataRequired,ValidationError
 import re
 from .models import Post,Category
-
+from .utils.form import MultipleCheckBoxField
 
 class CreatePostForm(FlaskForm):
     title = StringField(label="Post title",validators=[DataRequired()])
     summary = TextAreaField(label="Post summary")
     content = TextAreaField(label="Post content",validators=[DataRequired()])
     slug = StringField(label="Post slug",validators=[DataRequired()])
+    categories_ = MultipleCheckBoxField(label="Categories",choices=[],coerce=int)
     submit = SubmitField(label="Create post")
 
     def validate_title(self,title):
@@ -30,6 +31,7 @@ class ModifyPostForm(FlaskForm):
     summary = TextAreaField(label="Post summary")
     content = TextAreaField(label="Post content",validators=[DataRequired()])
     slug = StringField(label="Post slug",validators=[DataRequired()])
+    categories_ = MultipleCheckBoxField(label="Categories",choices=[],coerce=int)
     submit = SubmitField(label="Modify post")
 
     def set_post_id(self,post_id):
