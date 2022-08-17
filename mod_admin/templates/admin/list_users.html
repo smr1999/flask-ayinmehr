@@ -1,0 +1,32 @@
+{% extends 'admin/base.html' %}
+
+{% block page_content %}
+<div class="container">
+    {% if users %}
+    <h1 class="text-center pt-4">List users</h1><br><br><br>
+    <table class="table table-hover table-striped table-responsive">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Full Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+          </tr>
+        </thead>
+    
+        <tbody class="table-group-divider">
+            {% set index = namespace(value=0) %}
+            {% for user in users %}
+            {% set index.value = index.value + 1 %}
+            <tr>
+                <th scope="row">{{ index.value }}</th>
+                <td>{{ user.fullname or '-' }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ "Normal" if user.role == 0 else "Admin" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %}

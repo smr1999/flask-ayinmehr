@@ -6,6 +6,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv(
         'SQLALCHEMY_TRACK_MODIFICATIONS', False)
     SECRET_KEY=os.getenv('SECRET_KEY')
+    SQLALCHEMY_ECHO = 1
 
 class Development(Config):
     pass

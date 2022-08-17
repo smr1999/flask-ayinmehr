@@ -1,18 +1,12 @@
-from multiprocessing import context
 from flask import render_template, request, abort, session,flash,redirect,url_for
 from http import HTTPStatus
 from app import db
 from . import admin
 from .utils import admin_view
-from mod_user.forms import LoginForm
+from mod_user.forms import LoginForm,RegisterForm
 from mod_user.models import User
-from mod_blog.forms import CreatePostForm
+from mod_blog.forms import CreatePostForm,ModifyPostForm
 from mod_blog.models import Post
-
-# @admin.before_request
-# def before_req():
-#     print (session)
-#     return ''
 
 @admin.route('/')
 @admin_view
@@ -50,6 +44,33 @@ def logout():
     flash('You logged out successfully .',category='warning')
     return redirect(url_for('admin.login'))
 
+@admin.route('/users')
+@admin_view
+def list_users():
+    users = User.query.order_by(User.id.desc()).all()
+    return render_template('admin/list_users.html',users=users,title="List Users")
+
+@admin.route('/users/new',methods=["GET","POST"])
+@admin_view
+def create_user():
+    register_form = RegisterForm()
+    if request.method == 'POST':
+        if register_form.validate_on_submit():
+            user = User(fullname=register_form.fullname.data,email=register_form.email.data)
+            user.set_password(register_form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            flash('Account created successfully !',category='success')
+            return redirect(url_for('admin.list_users'))
+        flash('Fix these bugs and then resend the form .','danger')
+    return render_template('admin/create_user.html',title="Register User",form=register_form)
+
+@admin.route('/posts')
+@admin_view
+def list_posts():
+    posts = Post.query.order_by(Post.id.desc()).all()
+    return render_template('admin/list_posts.html',posts=posts)
+
 @admin.route('/posts/new',methods=['GET','POST'])
 @admin_view
 def create_post():
@@ -60,6 +81,32 @@ def create_post():
             db.session.add(post)
             db.session.commit()
             flash("Post created successfully","success")
-            return redirect(url_for('admin.index'))
+            return redirect(url_for('admin.list_posts'))
         flash("Fix the errors and send form again","danger")
     return render_template('admin/create_post.html',title='Create Post',form=create_post_form)
+
+@admin.route('/post/delete/<int:post_id>')
+@admin_view
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    flash(f'Post \"{post.title}\" deleted successfully .',category='warning')
+    return redirect(url_for('admin.list_posts'))
+
+@admin.route('/posts/modify/<int:post_id>',methods=['GET','POST'])
+@admin_view
+def modify_post(post_id):
+    post = Post.query.get(post_id)
+    modify_post_form = ModifyPostForm(obj=post)
+    modify_post_form.set_post_id(post_id)
+    if request.method == 'POST':
+        if modify_post_form.validate_on_submit():
+            modify_post_form.populate_obj(post)
+            db.session.add(post)
+            db.session.commit()
+            flash("Post modified successfully","success")
+            return redirect(url_for('admin.list_posts'))
+        flash("Fix the errors and send form again","danger")
+    return render_template('admin/modify_post.html',form=modify_post_form)
+
