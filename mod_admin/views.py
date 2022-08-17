@@ -5,8 +5,8 @@ from . import admin
 from .utils import admin_view
 from mod_user.forms import LoginForm,RegisterForm
 from mod_user.models import User
-from mod_blog.forms import CreatePostForm,ModifyPostForm
-from mod_blog.models import Post
+from mod_blog.forms import CreatePostForm, ModifyCategoryForm,ModifyPostForm,CreateCategoryForm
+from mod_blog.models import Category, Post
 
 @admin.route('/')
 @admin_view
@@ -53,10 +53,11 @@ def list_users():
 @admin.route('/users/new',methods=["GET","POST"])
 @admin_view
 def create_user():
-    register_form = RegisterForm()
+    user = User()
+    register_form = RegisterForm(obj=user)
     if request.method == 'POST':
         if register_form.validate_on_submit():
-            user = User(fullname=register_form.fullname.data,email=register_form.email.data)
+            register_form.populate_obj(user)
             user.set_password(register_form.password.data)
             db.session.add(user)
             db.session.commit()
@@ -69,15 +70,16 @@ def create_user():
 @admin_view
 def list_posts():
     posts = Post.query.order_by(Post.id.desc()).all()
-    return render_template('admin/list_posts.html',posts=posts)
+    return render_template('admin/list_posts.html',posts=posts,title="List Posts")
 
 @admin.route('/posts/new',methods=['GET','POST'])
 @admin_view
 def create_post():
-    create_post_form = CreatePostForm()
+    post = Post()
+    create_post_form = CreatePostForm(obj=post)
     if request.method == 'POST':
         if create_post_form.validate_on_submit():
-            post = Post(title=create_post_form.title.data,summary=create_post_form.summary.data,content=create_post_form.content.data,slug=create_post_form.slug.data)
+            create_post_form.populate_obj(post)
             db.session.add(post)
             db.session.commit()
             flash("Post created successfully","success")
@@ -85,7 +87,7 @@ def create_post():
         flash("Fix the errors and send form again","danger")
     return render_template('admin/create_post.html',title='Create Post',form=create_post_form)
 
-@admin.route('/post/delete/<int:post_id>')
+@admin.route('/posts/delete/<int:post_id>')
 @admin_view
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
@@ -108,5 +110,50 @@ def modify_post(post_id):
             flash("Post modified successfully","success")
             return redirect(url_for('admin.list_posts'))
         flash("Fix the errors and send form again","danger")
-    return render_template('admin/modify_post.html',form=modify_post_form)
+    return render_template('admin/modify_post.html',form=modify_post_form,title="Modify Post")
 
+@admin.route('/categories')
+@admin_view
+def list_categories():
+    categories = Category.query.order_by(Category.id.desc()).all()
+    return render_template('admin/list_categories.html',categories=categories,title="List Categories")
+
+@admin.route('/categories/new',methods=['GET','POST'])
+@admin_view
+def create_category():
+    category = Category()
+    create_category_form = CreateCategoryForm(obj=category)
+    if request.method == 'POST':
+        if create_category_form.validate_on_submit():
+            create_category_form.populate_obj(category)
+            db.session.add(category)
+            db.session.commit()
+            flash("Category created successfully","success")
+            return redirect(url_for('admin.list_categories'))
+        flash("Fix the errors and send form again","danger")
+    return render_template('admin/create_category.html',title='Create Category',form=create_category_form)
+
+@admin.route('/categories/delete/<int:category_id>')
+@admin_view
+def delete_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    db.session.delete(category)
+    db.session.commit()
+    flash(f'Category \"{category.name}\" deleted successfully .',category='warning')
+    return redirect(url_for('admin.list_categories'))
+
+@admin.route('/categories/modify/<int:category_id>',methods=['GET','POST'])
+@admin_view
+def modify_category(category_id):
+    category = Category.query.get(category_id)
+    modify_category_form = ModifyCategoryForm(obj=category)
+    modify_category_form.set_category_id(category_id)
+    if request.method == 'POST':
+        if modify_category_form.validate_on_submit():
+            modify_category_form.populate_obj(category)
+            db.session.add(category)
+            db.session.commit()
+            flash("Category modified successfully","success")
+            return redirect(url_for('admin.list_categories'))
+        flash("Fix the errors and send form again","danger")
+    return render_template('admin/modify_category.html',form=modify_category_form,title="Modify Category")
