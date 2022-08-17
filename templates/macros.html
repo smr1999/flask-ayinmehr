@@ -1,4 +1,4 @@
-{% macro register_errors(field) %}
+{% macro field_error(field) %}
     {% with errors=field.errors %}
         {% if errors %}
             {% for error in errors %}

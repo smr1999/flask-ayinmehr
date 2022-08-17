@@ -8,13 +8,10 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
 </head>
 <body>
-    <div class="bg-light">
-        <div class="container">
-            {% include '_flash_messages.html' %}
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
+    {% include '_flash_messages.html' %}
+    
+    {% block content %}
+    {% endblock %}
     <script src="{{ url_for('static',filename='js/bootstrap.bundle.min.js') }}"></script>
 </body>
 </html>
