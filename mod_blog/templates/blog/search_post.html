@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+{% from 'blog/macros.html' import post_card %}
+
+{% block page_content %}
+<div class="container">
+    <h1 class="my-3">Search for '{{ search }}'</h1>
+    {% if posts %}
+        {% for post in posts %}
+            {{ post_card(post) }} <br>
+        {% endfor %}
+    {% else %}
+    <h3>No post found</h3>    
+    {% endif %}
+
+</div>
+{% endblock %}

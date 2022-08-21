@@ -87,3 +87,7 @@ class ModifyCategoryForm(FlaskForm):
             raise ValidationError("Slug dupplicated . Try another slug .")
         if not re.search("^[a-z0-9]+(?:-[a-z0-9]+)*$", str(self.slug.data)):
             raise ValidationError("Invalid slug pattern")
+
+class SearchForm(FlaskForm):
+    search = StringField(label='Serach',validators=[DataRequired()])
+    submit = SubmitField(label="Search")

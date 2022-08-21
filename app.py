@@ -5,7 +5,7 @@ from config import Development
 
 app = Flask(__name__)
 app.config.from_object(Development)
- 
+
 # initilize dependencies
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
@@ -21,4 +21,4 @@ from mod_blog import blog
 app.register_blueprint(blog)
 
 # Main app
-import views
+import views,context_proccesor
