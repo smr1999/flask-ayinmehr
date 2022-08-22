@@ -20,5 +20,8 @@ app.register_blueprint(user)
 from mod_blog import blog
 app.register_blueprint(blog)
 
+from mod_upload import upload
+app.register_blueprint(upload)
+
 # Main app
 import views,context_proccesor

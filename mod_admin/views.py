@@ -1,12 +1,23 @@
 from flask import render_template, request, abort, session,flash,redirect,url_for
+from werkzeug.utils import secure_filename
+from markupsafe import Markup
+from sqlalchemy.exc import IntegrityError
 from http import HTTPStatus
+from uuid import uuid1
+
 from app import db
+
 from . import admin
 from .utils import admin_view
+
 from mod_user.forms import LoginForm,RegisterForm
 from mod_user.models import User
+
 from mod_blog.forms import CreatePostForm, ModifyCategoryForm,ModifyPostForm,CreateCategoryForm
 from mod_blog.models import Category, Post
+
+from mod_upload.forms import FileUploadForm
+from mod_upload.models import File
 
 @admin.route('/')
 @admin_view
@@ -162,3 +173,25 @@ def modify_category(category_id):
             return redirect(url_for('admin.modify_category',category_id=category_id))
         flash("Fix the errors and send form again","danger")
     return render_template('admin/modify_category.html',form=modify_category_form,title="Modify Category")
+
+@admin.route('/upload',methods=['GET','POST'])
+@admin_view
+def upload_file():
+    form = FileUploadForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print(dir(form.file.data))
+            filename = f'{str(uuid1())}_{secure_filename(form.file.data.filename)}'
+            form.file.data.save(f'static/uploads/{filename}')
+            file = File(filename=filename)
+            try:
+                db.session.add(file)
+                db.session.commit()
+                flash(Markup("File uploaded in <a href='{}' class='text-decoration-none'>Here</a>".format(url_for('static',filename='uploads/'+filename,_external=True))),category='success')
+            except IntegrityError:
+                db.session.rollback() 
+                flash('Upload again .',category='danger')
+            
+
+        #flash('A problem happend when upload file',category='danger')
+    return render_template('admin/upload_file.html',title='Upload File',form=form)
