@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
+from redis import Redis
 from config import Development
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ app.config.from_object(Development)
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
 mail = Mail(app)
+redis = Redis.from_url(app.config.get('REDIS_SERVER_URL'))
 
 # Register Blueprints
 from mod_admin import admin

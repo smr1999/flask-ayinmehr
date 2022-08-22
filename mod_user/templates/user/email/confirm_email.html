@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm registeration</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='img/flask-icon.png') }}" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to our site</h1>
+        <p>Click <a href="{{ url_for('user.confirm_register',token=token,_external=True) }}">Here</a> to confirm your email .</p>
+        <br><br><br><br>
+        <p>Thank you!</p>
+    </div>
+<script src="{{ url_for('static',filename='js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>
