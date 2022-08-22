@@ -191,7 +191,6 @@ def upload_file():
             except IntegrityError:
                 db.session.rollback() 
                 flash('Upload again .',category='danger')
-            
-
-        #flash('A problem happend when upload file',category='danger')
+            return redirect('admin.upload_file')
+        flash('A problem happend when upload file',category='danger')
     return render_template('admin/upload_file.html',title='Upload File',form=form)
